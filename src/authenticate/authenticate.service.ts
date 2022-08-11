@@ -39,7 +39,7 @@ export class AuthenticateService {
             Logger.log(err);
         }
         const councilMint = realmData.account?.config?.councilMint.toBase58();
-
+        console.log(councilMint);
         // Verify pubkey is a member or delegate in the realm
         const members = await getAllTokenOwnerRecords(
             connection,
@@ -54,6 +54,7 @@ export class AuthenticateService {
                 if(member.account.governingTokenMint.toString() === councilMint &&
                    !member.account.governingTokenDepositAmount.isZero()){
                     hasCouncilToken = true;
+                    console.log(member.account.governingTokenDepositAmount.toString());
                 }
                 await this.addMemberToTeam(body.pubKey, body.realm.pubKey);
                 await this.addMemberToChannels(body.pubKey, body.realm.pubKey, hasCouncilToken);
@@ -117,7 +118,7 @@ export class AuthenticateService {
             }
         }
         
-        if(!defaultChannels.Council.initialized) {
+        if(!defaultChannels.Council.initialized && hasCouncilToken) {
             Logger.log('Creating Council channel for ' + realmPubKey + '.');
             try {
                 await serverClient.channel('team', realmPubKey+'council', { 
